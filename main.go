@@ -7,7 +7,7 @@ import (
 
 func main() {
 	// Create backend
-	tl, err := backend.NewTransactionLogger("file")
+	tl, err := backend.NewTransactionLogger("postgres")
 	if err != nil {
 		panic(err)
 	}
