@@ -1,6 +1,8 @@
 package core
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNew(t *testing.T) {
 	store := NewKeyValueStore()
@@ -129,5 +131,10 @@ func TestDelete(t *testing.T) {
 	err = store.Delete(key3)
 	if err != nil {
 		t.Error(err)
+	}
+
+	size := store.Size()
+	if size != uint64(0) {
+		t.Error("returned size != 0 after all keys were deleted")
 	}
 }
