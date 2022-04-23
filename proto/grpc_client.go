@@ -21,7 +21,7 @@ func main() {
 	opts := []grpc.DialOption{grpc.WithInsecure(), grpc.WithBlock()}
 	conn, err := grpc.DialContext(ctx, "localhost:50051", opts...)
 	if err != nil {
-		log.Fatalf("did not connect: %w", err)
+		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
 

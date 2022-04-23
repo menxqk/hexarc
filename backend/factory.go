@@ -7,7 +7,7 @@ func NewTransactionLogger(s string) (TransactionLogger, error) {
 	case "file":
 		return NewFileTransactionLogger("./transactions.txt")
 	case "postgres":
-		return NewPostgresTransactionLogger()
+		return NewPostgresTransactionLogger("transactions")
 	default:
 		return nil, fmt.Errorf("no such transaction logger %q", s)
 	}

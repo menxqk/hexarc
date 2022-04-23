@@ -9,23 +9,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 type PostgresTransactionLogger struct {
-	events chan<- Event
-	errors <-chan error
-	db     *sql.DB
-	wg     *sync.WaitGroup
+	events    chan<- Event
+	errors    <-chan error
+	db        *sql.DB
+	wg        *sync.WaitGroup
+	tableName string
 }
 
-func NewPostgresTransactionLogger() (TransactionLogger, error) {
-	err := godotenv.Load(".env")
-	if err != nil {
-		return nil, fmt.Errorf("could not load environment variables: %w", err)
-	}
-
+func NewPostgresTransactionLogger(table string) (TransactionLogger, error) {
 	host := os.Getenv("PG_HOST")
 	dbName := os.Getenv("PG_DBNAME")
 	user := os.Getenv("PG_USER")
@@ -43,7 +38,7 @@ func NewPostgresTransactionLogger() (TransactionLogger, error) {
 		return nil, fmt.Errorf("failed to open db connection: %w", err)
 	}
 
-	tl := &PostgresTransactionLogger{db: db, wg: &sync.WaitGroup{}}
+	tl := &PostgresTransactionLogger{db: db, wg: &sync.WaitGroup{}, tableName: table}
 
 	exists, err := tl.verifyTableExists()
 	if err != nil {
@@ -85,7 +80,8 @@ func (p *PostgresTransactionLogger) Run() {
 
 	// events goroutine
 	go func() {
-		query := `INSERT INTO transactions (event_type, key, value) VALUES ($1, $2, $3)`
+		query := `INSERT INTO %s (event_type, key, value) VALUES ($1, $2, $3)`
+		query = fmt.Sprintf(query, p.tableName)
 
 		for e := range events {
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -127,7 +123,8 @@ func (p *PostgresTransactionLogger) ReadEvents() (<-chan Event, <-chan error) {
 	outEvent := make(chan Event)
 	outError := make(chan error, 1)
 
-	query := `SELECT sequence, event_type, key, value FROM transactions`
+	query := `SELECT sequence, event_type, key, value FROM %s`
+	query = fmt.Sprintf(query, p.tableName)
 
 	go func() {
 		defer close(outEvent)
@@ -167,36 +164,35 @@ func (p *PostgresTransactionLogger) ReadEvents() (<-chan Event, <-chan error) {
 }
 
 func (p *PostgresTransactionLogger) verifyTableExists() (bool, error) {
-	const table = "transactions"
-
 	var result string
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	rows, err := p.db.QueryContext(ctx, fmt.Sprintf("SELECT to_regclass('public.%s');", table))
+	rows, err := p.db.QueryContext(ctx, fmt.Sprintf("SELECT to_regclass('public.%s');", p.tableName))
 	defer rows.Close()
 	if err != nil {
 		return false, err
 	}
 
-	for rows.Next() && result != table {
+	for rows.Next() && result != p.tableName {
 		rows.Scan(&result)
 	}
 
-	return result == table, rows.Err()
+	return result == p.tableName, rows.Err()
 }
 
 func (p *PostgresTransactionLogger) createTable() error {
 	var err error
 
-	createQuery := `CREATE TABLE transactions (
+	createQuery := `CREATE TABLE %s (
 		sequence BIGSERIAL PRIMARY KEY,
 		event_type SMALLINT,
 		key TEXT, 
 		value TEXT
 	);
 	`
+	createQuery = fmt.Sprintf(createQuery, p.tableName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

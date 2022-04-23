@@ -3,16 +3,23 @@ package main
 import (
 	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/menxqk/hexarc/backend"
 	"github.com/menxqk/hexarc/core"
 	"github.com/menxqk/hexarc/frontend"
 )
 
 func main() {
+	// Load environment variables
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+
 	chError := make(chan error)
 
 	// Create backend
-	tl, err := backend.NewTransactionLogger("file")
+	tl, err := backend.NewTransactionLogger("postgres")
 	if err != nil {
 		panic(err)
 	}
