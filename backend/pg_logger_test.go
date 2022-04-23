@@ -4,23 +4,30 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 const testTable = "test_transactions"
 
-func TestNewPostgresTransactionLogger(t *testing.T) {
-	os.Setenv("PG_HOST", "localhost")
-	os.Setenv("PG_DBNAME", "test")
-	os.Setenv("PG_USER", "test")
-	os.Setenv("PG_PASSWORD", "test")
+func TestMain(m *testing.M) {
+	err := godotenv.Load("tests.env")
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	m.Run()
+}
+
+func TestNewPostgresTransactionLogger(t *testing.T) {
 	tl, err := NewPostgresTransactionLogger(testTable)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	_, ok := tl.(*PostgresTransactionLogger)
 	if !ok {
@@ -95,10 +102,10 @@ func TestPostgresReadEvents(t *testing.T) {
 }
 
 func getPsqlDb() (*sql.DB, error) {
-	host := "localhost"
-	dbName := "test"
-	user := "test"
-	password := "test"
+	host := os.Getenv("PG_HOST")
+	dbName := os.Getenv("PG_DBNAME")
+	user := os.Getenv("PG_USER")
+	password := os.Getenv("PG_PASSWORD")
 
 	connStr := fmt.Sprintf("host=%s dbname=%s user=%s password=%s sslmode=disable", host, dbName, user, password)
 
