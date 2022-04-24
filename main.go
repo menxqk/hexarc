@@ -19,7 +19,7 @@ func main() {
 	chError := make(chan error)
 
 	// Create backend
-	tl, err := backend.NewTransactionLogger("postgres")
+	tl, err := backend.NewTransactionLogger("file")
 	if err != nil {
 		panic(err)
 	}

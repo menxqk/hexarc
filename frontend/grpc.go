@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
 
 	"github.com/menxqk/hexarc/core"
 	"google.golang.org/grpc"
@@ -19,7 +20,9 @@ type grpcFrontEnd struct {
 func (g *grpcFrontEnd) Start(kv *core.KeyValueStore) error {
 	g.store = kv
 
-	lis, err := net.Listen("tcp", ":50051")
+	grpcPort := os.Getenv("GRPC_PORT")
+
+	lis, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %w", err)
 	}

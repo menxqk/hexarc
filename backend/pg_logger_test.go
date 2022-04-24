@@ -4,25 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"reflect"
 	"testing"
 	"time"
-
-	"github.com/joho/godotenv"
 )
-
-const testTable = "test_transactions"
-
-func TestMain(m *testing.M) {
-	err := godotenv.Load("tests.env")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	m.Run()
-}
 
 func TestNewPostgresTransactionLogger(t *testing.T) {
 	tl, err := NewPostgresTransactionLogger(testTable)
@@ -72,9 +58,9 @@ func TestPostgresReadEvents(t *testing.T) {
 		t.Errorf("4 events were expected, events read: %d", count)
 	}
 	tl1.Run()
-	tl1.WritePut("quatro", "quarta") // Event 5
-	tl1.WriteDelete("quatro")        // Event 6
-	tl1.WritePut("cinco", "quinta")  // Event 7
+	tl1.WritePut("key4", "value4") // Event 5
+	tl1.WriteDelete("key4")        // Event 6
+	tl1.WritePut("key5", "value5") // Event 7
 	err = tl1.Close()
 	if err != nil {
 		t.Error(err)
@@ -160,10 +146,10 @@ func createTestTable(db *sql.DB) error {
 
 func write4PostgresEvents(db *sql.DB) error {
 	events := []Event{
-		{0, EventPut, "uma", "primeira"},
-		{0, EventPut, "duas", "segunda"},
-		{0, EventPut, "três", "terceira"},
-		{0, EventDelete, "uma", ""},
+		{0, EventPut, "key1", "value1"},
+		{0, EventPut, "key2", "value2"},
+		{0, EventPut, "key3", "value3"},
+		{0, EventDelete, "key1", ""},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

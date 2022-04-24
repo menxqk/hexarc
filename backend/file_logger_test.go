@@ -55,9 +55,9 @@ func TestFileReadEvents(t *testing.T) {
 		t.Errorf("4 events were expected, events read: %d", count)
 	}
 	tl1.Run()
-	tl1.WritePut("quatro", "quarta") // Event 5
-	tl1.WriteDelete("quatro")        // Event 6
-	tl1.WritePut("cinco", "quinta")  // Event 7
+	tl1.WritePut("key4", "value4") // Event 5
+	tl1.WriteDelete("key4")        // Event 6
+	tl1.WritePut("key5", "value5") // Event 7
 	err = tl1.Close()
 	if err != nil {
 		t.Error(err)
@@ -90,10 +90,10 @@ func TestFileReadEvents(t *testing.T) {
 
 func write4FileEvents(f *os.File) error {
 	events := []string{
-		"1	1	uma	primeira",
-		"2	1	duas	segunda",
-		"3	1	três	terceira",
-		"4	2	uma	",
+		"1	1	key1	value1",
+		"2	1	key2	value2",
+		"3	1	key3	value3",
+		"4	2	key1	",
 	}
 
 	for _, e := range events {

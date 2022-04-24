@@ -1,3 +1,4 @@
 transactions.txt
 .env
 backend/tests.env
+frontend/tests.env

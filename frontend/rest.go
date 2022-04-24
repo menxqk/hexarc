@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/menxqk/hexarc/core"
@@ -17,6 +18,8 @@ type restFrontEnd struct {
 func (f *restFrontEnd) Start(store *core.KeyValueStore) error {
 	f.store = store
 
+	restPort := os.Getenv("REST_PORT")
+
 	r := mux.NewRouter()
 	r.Use(f.loggingMiddleware)
 
@@ -27,7 +30,7 @@ func (f *restFrontEnd) Start(store *core.KeyValueStore) error {
 	r.HandleFunc("/v1", f.notAllowedHandler)
 	r.HandleFunc("/v1/{key}", f.notAllowedHandler)
 
-	return http.ListenAndServe(":8080", r)
+	return http.ListenAndServe(":"+restPort, r)
 }
 
 func (f *restFrontEnd) loggingMiddleware(next http.Handler) http.Handler {

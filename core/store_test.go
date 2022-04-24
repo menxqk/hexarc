@@ -4,14 +4,14 @@ import (
 	"testing"
 )
 
-func TestNew(t *testing.T) {
+func TestStoreNew(t *testing.T) {
 	store := NewKeyValueStore()
 	if store == nil {
 		t.Error("New store is nil")
 	}
 
 }
-func TestGet(t *testing.T) {
+func TestStoreGet(t *testing.T) {
 	store := NewKeyValueStore()
 
 	const key = "a-key"
@@ -43,7 +43,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestPut(t *testing.T) {
+func TestStorePut(t *testing.T) {
 	store := NewKeyValueStore()
 
 	const key1 = "a-key"
@@ -78,7 +78,7 @@ func TestPut(t *testing.T) {
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestStoreDelete(t *testing.T) {
 	store := NewKeyValueStore()
 
 	const key1 = "a-key"
@@ -106,7 +106,7 @@ func TestDelete(t *testing.T) {
 		t.Error()
 	}
 	if val != value2 {
-		t.Errorf("val/value2 mismatch, val: %q, value: %q", val, value2)
+		t.Errorf("val/value2 mismatch, val: %q, value2: %q", val, value2)
 	}
 
 	err = store.Delete(key2)
