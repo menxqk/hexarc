@@ -95,6 +95,14 @@ func (k *KeyValueStore) Size() uint64 {
 	return size
 }
 
+func (k *KeyValueStore) GetAll() map[string]string {
+	all := make(map[string]string, len(k.m))
+	for k, v := range k.m {
+		all[k] = v
+	}
+	return all
+}
+
 func (k *KeyValueStore) WaitForTransactionLogger() {
 	k.transact.Wait()
 }

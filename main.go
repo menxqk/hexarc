@@ -39,9 +39,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	feWebserver, err := frontend.NewFrontEnd("webserver")
+	if err != nil {
+		panic(err)
+	}
 
 	// Start frontends
-	startFrontEnds(store, chError, feRest, feGrpc)
+	startFrontEnds(store, chError, feRest, feGrpc, feWebserver)
 
 	// Block on error channel waiting for and error coming from the frontends
 	log.Fatal(<-chError)

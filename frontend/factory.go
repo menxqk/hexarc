@@ -10,6 +10,8 @@ func NewFrontEnd(s string) (FrontEnd, error) {
 		return &restFrontEnd{}, nil
 	case "grpc":
 		return &grpcFrontEnd{}, nil
+	case "webserver":
+		return &webserverFrontEnd{}, nil
 	default:
 		return nil, fmt.Errorf("no such frontend %s", s)
 	}

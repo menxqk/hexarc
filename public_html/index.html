@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Webserver FrontEnd</title>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row pt-4">
+            <div class="col-8">
+                <p class="h2 text-center">Operations</p>
+
+                <!-- GET -->
+                <div class="op-box">
+                    <p class="text-dark fs-3">Get</p>
+                    <div class="row pb-2 pt-2">
+                        <div class="col">
+                            <input id="getKey" type="text" class="form-control" placeholder="Key">
+                        </div>
+                        <div class="col">
+                            <input  id="getValue" type="text" class="form-control" disabled value="">
+                        </div>
+                    </div>
+                    <div class="row pb-2 pt-2">
+                        <div class="col">
+                            <div class="d-flex justify-content-start">
+                                <button id="getBtn" class="btn btn-warning">Get</button>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+                
+                <!-- INSERT -->
+                <div class="op-box">
+                    <p class="text-dark fs-3">Insert</p>
+                    <div class="row pb-2 pt-2">
+                        <div class="col">
+                            <input id="insertKey" type="text" class="form-control" placeholder="Key">
+                        </div>
+                        <div class="col">
+                            <input id="insertValue" type="text" class="form-control" placeholder="Value">
+                        </div>
+                    </div>
+                    <div class="row pb-2 pt-2">
+                        <div class="col">
+                            <div class="d-flex justify-content-start">
+                                <button id="insertBtn" class="btn btn-primary">Insert</button>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+
+                <!-- DELETE -->
+                <div class="op-box">
+                    <p class="text-dark fs-3">Delete</p>
+                    <div class="row pb-2 pt-2">
+                        <div class="col">
+                            <input id="deleteKey" type="text" class="form-control" placeholder="Key">
+                        </div>
+                        <div class="col"></div>
+                    </div>
+                    <div class="row pb-2 pt-2">
+                        <div class="col">
+                            <div class="d-flex justify-content-start">
+                                <button id="deleteBtn" class="btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+
+            </div>
+            <div class="col-4 text-center">
+                <p class="h3">Key Value Store</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Key</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>one</td>
+                            <td>first</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>two</td>
+                            <td>second</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    const getKey = document.getElementById('getKey');
+    const getValue = document.getElementById('getValue');
+    const getBtn = document.getElementById('getBtn');
+
+    const insertKey = document.getElementById('insertKey')
+    const insertValue = document.getElementById('insertValue');
+    const insertBtn = document.getElementById('insertBtn');
+
+    const deleteKey = document.getElementById('deleteKey');
+    const deleteBtn = document.getElementById('deleteBtn');
+   
+    const tableBody = document.getElementById('tableBody');
+
+    const apiUrl = '/api/'
+    const allurl = '/all'
+
+    const getKeyApi = async function() {
+        const key = getKey.value;
+        if (!key) {
+            return
+        }
+
+        const response = await fetch(apiUrl + key)
+        const data = await response.json();
+        if (data.ok && data.count === 1) {
+            getValue.value = data.data;
+        }
+    }
+
+    const putKeyApi = async function() {
+        const key = insertKey.value;
+        const value = insertValue.value;
+        if (!key || !value) {
+            return
+        }
+
+        const options = {
+            method: 'PUT',
+            body: value,
+        }
+        const response = await fetch(apiUrl + key, options);
+        if (response.ok) {
+            updateTable();
+            insertKey.value = '';
+            insertValue.value = '';
+        }
+    }
+
+    const deleteApiKey = async function() {
+        const key = deleteKey.value;
+        if (!key) {
+            return
+        }
+
+        const options = {
+            method: 'DELETE'
+        }
+        const response = await fetch(apiUrl + key, options)
+        if (response.ok) {
+            updateTable();
+            deleteKey.value = '';
+        }
+    }
+
+    const clearTable = function() {
+        tableBody.innerHTML = '';
+    }
+
+    const updateTable = async function() {
+        clearTable();
+        const response = await fetch(allurl)
+        const data = await response.json();
+        if (data.ok) {
+            let i = 1
+            for (var [key, value] of Object.entries(data.data)) {
+                const tr = document.createElement('tr')
+                tr.innerHTML = `
+                    <th scope="row">${i}</th>
+                    <td>${key}</td>
+                    <td>${value}</td>
+                `;
+                tableBody.append(tr);
+                i++;                
+            }
+        }
+    }
+
+    getKey.addEventListener('focus', function() {
+        getValue.value = '';
+    })
+    getBtn.addEventListener('click', getKeyApi);
+
+    insertKey.addEventListener('focus', function() {
+        insertValue.value = '';
+    });
+    insertBtn.addEventListener('click', putKeyApi);
+
+    deleteBtn.addEventListener('click', deleteApiKey);
+
+    updateTable();
+});
+
+</script>
+
+</body>
+</html>
