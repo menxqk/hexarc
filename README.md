@@ -5,4 +5,12 @@ This project is an adaptation of the [**hexarc**](https://github.com/cloud-nativ
 [![Cloud Native Go - Book](cloud_native_go.jpeg)](https://learning.oreilly.com/library/view/cloud-native-go/9781492076322/)
 
 
+Basic architecture: *frontend* → *core* → *backend*
+
+**frontend:** receives requests from clients (gRPC, REST, web) and access *core* functionality;
+
+**core:** implements a key/value store service;
+
+**backend:** logs operations executed by *core* and rebuilds the state of the key/value store;
+
 This repository is still a work in progress.
