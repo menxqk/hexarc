@@ -23,6 +23,9 @@ var (
 
 	testRestFrontend *restFrontEnd
 	restPort         string
+
+	testWebserverFrontend *webserverFrontEnd
+	webserverPort         string
 )
 
 func TestMain(m *testing.M) {
@@ -56,7 +59,7 @@ func TestMain(m *testing.M) {
 	defer conn.Close()
 	grpcClient = pb.NewKeyValueClient(conn)
 
-	// REST server Setup
+	// REST server setup
 	restPort = os.Getenv("REST_PORT")
 	feRest, err := NewFrontEnd("rest")
 	if err != nil {
@@ -69,6 +72,21 @@ func TestMain(m *testing.M) {
 	// Start rest server on its own goroutine
 	go func() {
 		testRestFrontend.Start(testKeyValueStore)
+	}()
+
+	// WEBSERVER setup
+	webserverPort = os.Getenv("WEBSERVER_PORT")
+	feWebserver, err := NewFrontEnd("webserver")
+	if err != nil {
+		log.Fatal(err)
+	}
+	testWebserverFrontend, ok = feWebserver.(*webserverFrontEnd)
+	if !ok {
+		log.Fatalf("type mismatch for webserverFrontEnd: %v", reflect.TypeOf(feWebserver))
+	}
+	// Start webserver on its own goroutine
+	go func() {
+		testWebserverFrontend.Start(testKeyValueStore)
 	}()
 
 	m.Run()

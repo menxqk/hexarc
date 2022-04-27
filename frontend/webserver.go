@@ -64,21 +64,26 @@ type jsonResponse struct {
 func (ws *webserverFrontEnd) getHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	key := vars["key"]
-	resp := jsonResponse{}
+
+	if key == "" {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
 
 	value, err := ws.store.Get(key)
 	if err == core.ErrorNoSuchKey {
-		resp.Ok = false
-		resp.Count = 0
+		http.Error(w, core.ErrorNoSuchKey.Error(), http.StatusNotFound)
+		return
 	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	} else {
-		resp.Ok = true
-		resp.Count = 1
-		resp.Data = value
 	}
 
+	resp := jsonResponse{
+		Ok:    true,
+		Count: 1,
+		Data:  value,
+	}
 	json, err := json.Marshal(resp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -93,17 +98,17 @@ func (ws *webserverFrontEnd) putHandler(w http.ResponseWriter, r *http.Request) 
 	vars := mux.Vars(r)
 	key := vars["key"]
 
+	if key == "" {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
 	value, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer r.Body.Close()
-
-	if key == "" {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
 	err = ws.store.Put(key, string(value))
 	if err != nil {
