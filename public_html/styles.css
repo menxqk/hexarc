@@ -3,6 +3,7 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 .body {
@@ -14,5 +15,5 @@
     border: 1px solid #cacaca;
     border-style: solid;
     border-radius: 0.25rem;
-    padding: 1.5rem;
+    padding: 2rem;
 }

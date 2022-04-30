@@ -10,79 +10,65 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="row pt-4">
+    <div class="container mt-4">
+        <div class="row gx-4">
+            
+            <!-- OPERATIONS -->
             <div class="col-8">
-                <p class="h2 text-center">Operations</p>
-
-                <!-- GET -->
+                <p class="h3 text-center">Operations</p>                
+                
+                <!-- get -->
                 <div class="op-box">
                     <p class="text-dark fs-3">Get</p>
-                    <div class="row pb-2 pt-2">
+                    <div class="row mb-4">
                         <div class="col">
-                            <input id="getKey" type="text" class="form-control" placeholder="Key">
+                            <input id="getKey" type="text" class="form-control" placeholder="key">
                         </div>
                         <div class="col">
-                            <input  id="getValue" type="text" class="form-control" disabled value="">
-                        </div>
-                    </div>
-                    <div class="row pb-2 pt-2">
-                        <div class="col">
-                            <div class="d-flex justify-content-start">
-                                <button id="getBtn" class="btn btn-warning">Get</button>
-                            </div>
-                        </div>
-                    </div>                    
-                </div>
-                
-                <!-- INSERT -->
-                <div class="op-box">
-                    <p class="text-dark fs-3">Insert</p>
-                    <div class="row pb-2 pt-2">
-                        <div class="col">
-                            <input id="insertKey" type="text" class="form-control" placeholder="Key">
-                        </div>
-                        <div class="col">
-                            <input id="insertValue" type="text" class="form-control" placeholder="Value">
+                            <input id="getValue" type="text" class="form-control" disabled value="">
                         </div>
                     </div>
-                    <div class="row pb-2 pt-2">
-                        <div class="col">
-                            <div class="d-flex justify-content-start">
-                                <button id="insertBtn" class="btn btn-primary">Insert</button>
-                            </div>
-                        </div>
-                    </div>                    
+                    <button id="getBtn" class="btn btn-warning">Get</button>
                 </div>
 
-                <!-- DELETE -->
+                <!-- insert -->
+                <div class="op-box">
+                    <p class="text-dark fs-3">Insert</p>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <input type="text" id="insertKey" class="form-control" placeholder="key">
+                        </div>
+                        <div class="col">
+                            <input type="text" id="insertValue" class="form-control" placeholder="value">
+                        </div>
+                    </div>
+                    <button id="insertBtn" class="btn btn-primary">Insert</button>
+                </div>
+
+                <!-- delete -->
                 <div class="op-box">
                     <p class="text-dark fs-3">Delete</p>
-                    <div class="row pb-2 pt-2">
+                    <div class="row mb-4">
                         <div class="col">
-                            <input id="deleteKey" type="text" class="form-control" placeholder="Key">
+                            <input type="text" id="deleteKey" class="form-control" placeholder="key">
                         </div>
                         <div class="col"></div>
                     </div>
-                    <div class="row pb-2 pt-2">
-                        <div class="col">
-                            <div class="d-flex justify-content-start">
-                                <button id="deleteBtn" class="btn btn-danger">Delete</button>
-                            </div>
-                        </div>
-                    </div>                    
+                    <button id="deleteBtn" class="btn btn-danger">Delete</button>
                 </div>
 
             </div>
-            <div class="col-4 text-center">
-                <p class="h3">Key Value Store</p>
+
+            <!-- KEY/VALUE STORE -->
+            <div class="col-4">
+                <p class="h3 text-center">Key/Value Store</p>
                 <table class="table">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Key</th>
-                            <th scope="col">Value</th>
-                        </tr>
+                            <th scope="col">key</th>
+                            <th scope="col">value</th>
+                        </tr>                        
                     </thead>
                     <tbody id="tableBody">
                         <tr>
@@ -98,6 +84,7 @@
                     </tbody>
                 </table>
             </div>
+
         </div>
     </div>
 
@@ -126,11 +113,15 @@ document.addEventListener("DOMContentLoaded", function() {
             return
         }
 
-        const response = await fetch(apiUrl + key)
+        const response = await fetch(apiUrl + key);
+        if (!response.ok) {
+            getKey.value = '';
+            getValue.value = '';
+        }
         const data = await response.json();
         if (data.ok && data.count === 1) {
             getValue.value = data.data;
-        }
+        } 
     }
 
     const putKeyApi = async function() {
